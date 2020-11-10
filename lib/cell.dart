@@ -21,6 +21,7 @@ class _CellState extends State<Cell> {
       },
       child: Container(
         decoration: BoxDecoration(
+          color: Colors.white,
           border: Border.all(color: Colors.black),
         ),
         child: Icon(

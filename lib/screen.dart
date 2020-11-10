@@ -14,7 +14,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final int rowLength = 3;
+  int rowLength = 3;
   List<Widget> cellList = List();
   bool hasCreated = false;
   bool isX = true;
@@ -247,19 +247,55 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     cellListCreator();
     return Scaffold(
+      backgroundColor: Colors.blueGrey[100],
       appBar: AppBar(
         title: Text("Let's Play!"),
       ),
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          (GridView.count(
-            crossAxisCount: rowLength,
-            scrollDirection: Axis.vertical,
-            shrinkWrap: true,
-            children: cellList,
-          )),
-          FlatButton(
-            child: Text('Restart'),
+          SafeArea(
+            child: Container(
+              margin: EdgeInsets.all(30),
+              decoration: BoxDecoration(
+                border: Border.all(width: 10, color: Colors.deepPurple),
+              ),
+              child: (GridView.count(
+                crossAxisCount: rowLength,
+                scrollDirection: Axis.vertical,
+                shrinkWrap: true,
+                children: cellList,
+              )),
+            ),
+          ),
+          Slider(
+            value: rowLength.toDouble(),
+            min: 3,
+            max: 15,
+            activeColor: Colors.black,
+            inactiveColor: Colors.grey,
+            onChanged: (newVal) {
+              setState(() {
+                rowLength = newVal.floor();
+                hasCreated = false;
+              });
+            },
+          ),
+          RaisedButton(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            color: Colors.black,
+            textColor: Colors.white,
+            child: Container(
+              padding: EdgeInsets.fromLTRB(3, 10, 3, 10),
+              child: Text(
+                'Restart',
+                style: TextStyle(
+                  fontSize: 20.0,
+                ),
+              ),
+            ),
             onPressed: () {
               // resetter();
               Navigator.pushNamed(context, '/win',
