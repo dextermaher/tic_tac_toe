@@ -16,22 +16,23 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int rowLength = 3;
   List<Widget> cellList = List();
-  bool hasCreated = false;
+  bool hasCellListCreated = false;
+  bool hasIconsFromBoardCreated = false;
   bool isX = true;
   List iconsFromBoard = List();
+  IconData circleIcon = Icons.panorama_fish_eye;
+  IconData xIcon = Icons.clear;
 
   void checkForLine(
     int index,
   ) {
     //check for cross win
-    if (iconsFromBoard[index] == Icons.clear) {
-      // checkSurrounding(index, Icons.clear);
-      checkManager(Icons.clear);
+    if (iconsFromBoard[index] == xIcon) {
+      checkManager(xIcon);
     }
     //check for circle win
-    else if (iconsFromBoard[index] == Icons.panorama_fish_eye) {
-      // checkSurrounding(index, Icons.clear);
-      checkManager(Icons.panorama_fish_eye);
+    else if (iconsFromBoard[index] == circleIcon) {
+      checkManager(circleIcon);
     }
   }
 
@@ -47,7 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
     for (int i = 0; i < rowLength * rowLength; i++) {
       if (iconsFromBoard[i] == icon) {
         setState(() {
-          rowElements.add(icon);
+          rowElements.add(true);
         });
       } else {
         setState(() {
@@ -75,7 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
       for (int j = i; j < rowLength * rowLength; j += rowLength) {
         if (iconsFromBoard[j] == icon) {
           setState(() {
-            rowElements.add(icon);
+            rowElements.add(true);
           });
         } else {
           setState(() {
@@ -113,7 +114,7 @@ class _MyHomePageState extends State<MyHomePage> {
           j += increaseDecrease) {
         if (iconsFromBoard[j] == icon) {
           setState(() {
-            rowElements.add(icon);
+            rowElements.add(true);
           });
         } else {
           setState(() {
@@ -142,67 +143,28 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  // void getBoardData() {
-  //   List keyList = cellData.keys.toList();
-  //   List valueList = cellData.values.toList();
-  //   int indexOfCounter = 0;
-  //   setState(() {
-  //     iconsFromBoard.clear();
-  //   });
-  //   for (int i = 0; i < rowLength ^ 2; i++) {
-  //     if (keyList.contains(i) && iconsFromBoard.contains(i)) {
-  //       if (keyList.indexOf(i) ==
-  //           valueList.indexOf(Icons.clear, indexOfCounter) && iconsFromBoard[i] == Icons.clear) {
-  //         indexOfCounter++;
-  //         setState(() {
-  //           iconsFromBoard[i] = Icons.clear;
-  //         });
-  //       } else {
-  //         setState(() {
-  //           iconsFromBoard[i] = Icons.panorama_fish_eye;
-  //         });
-  //       }
-  //     }
-  //   }
-  // }
-
-  void resetter() {
-    print('resetting');
-    setState(() {
-      cellList.clear();
-      hasCreated = false;
-      isX = true;
-      iconsFromBoard.clear();
-    });
-
-    cellListCreator();
-  }
-
   IconData iconBrain(int index) {
-    // checkForWin(index);
     if (iconsFromBoard[index] == '') {
       if (isX) {
         //next click is circle
         setState(() {
           isX = !isX;
         });
-        fillCell(index, Icons.clear);
+        fillCell(index, xIcon);
 
         checkForLine(index);
-        //checkAgainst(Icons.clear);
 
-        return Icons.clear;
+        return xIcon;
       } else {
         //next click is cross
         setState(() {
           isX = !isX;
         });
-        fillCell(index, Icons.panorama_fish_eye);
-        //checkAgainst(Icons.panorama_fish_eye);
+        fillCell(index, circleIcon);
 
         checkForLine(index);
 
-        return Icons.panorama_fish_eye;
+        return circleIcon;
       }
     } else {
       checkForLine(index);
@@ -213,15 +175,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void fillCell(int i, IconData icon) {
     setState(() {
-      // cellData.putIfAbsent(i, () => icon);
       iconsFromBoard[i] = icon;
     });
   }
 
   void cellListCreator() {
-    if (hasCreated == false) {
+    if (hasCellListCreated == false) {
       setState(() {
-        hasCreated = true;
+        hasCellListCreated = true;
         cellList = List<Widget>.generate(
           rowLength * rowLength,
           (i) => Cell(
@@ -230,22 +191,26 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         );
       });
-      iconsFromBoardResseter();
     }
   }
 
   void iconsFromBoardResseter() {
-    setState(() {
-      iconsFromBoard = List.generate(
-        rowLength * rowLength,
-        (i) => '',
-      );
-    });
+    if (hasIconsFromBoardCreated == false) {
+      setState(() {
+        iconsFromBoard = List.generate(
+          rowLength * rowLength,
+          (i) => '',
+        );
+        hasIconsFromBoardCreated = true;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     cellListCreator();
+    iconsFromBoardResseter();
+
     return Scaffold(
       backgroundColor: Colors.blueGrey[100],
       appBar: AppBar(
@@ -277,7 +242,8 @@ class _MyHomePageState extends State<MyHomePage> {
             onChanged: (newVal) {
               setState(() {
                 rowLength = newVal.floor();
-                hasCreated = false;
+                hasCellListCreated = false;
+                hasIconsFromBoardCreated = false;
               });
             },
           ),
@@ -293,6 +259,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 'Restart',
                 style: TextStyle(
                   fontSize: 20.0,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),

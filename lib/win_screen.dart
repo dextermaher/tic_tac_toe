@@ -6,24 +6,41 @@ class WinScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final WinMessage winText = ModalRoute.of(context).settings.arguments;
-    return Container(
-      child: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Text(
-              winText.winMessage,
+    return Scaffold(
+      backgroundColor: Colors.blueGrey[100],
+      body: Container(
+        child: SafeArea(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Text(
+                  winText.winMessage,
+                  style: TextStyle(fontSize: 60),
+                ),
+                RaisedButton(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  color: Colors.black,
+                  child: Container(
+                    padding: EdgeInsets.fromLTRB(3, 10, 3, 10),
+                    child: Text(
+                      'Play!',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/play');
+                  },
+                ),
+              ],
             ),
-            FlatButton(
-              child: Text(
-                'Play!',
-                style: TextStyle(color: Colors.white, fontSize: 30),
-              ),
-              onPressed: () {
-                Navigator.pushNamed(context, '/play');
-              },
-            ),
-          ],
+          ),
         ),
       ),
     );
