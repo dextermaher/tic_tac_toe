@@ -67,17 +67,14 @@ class _MyHomePageState extends State<MyHomePage> {
           hasGameStarted = false;
           hasWon = true;
           winMessage = '${isX == false ? '×' : '○'} Won Horizontally!';
-          startOffset = Offset(
-              0,
-              (MediaQuery.of(context).size.width - 60) *
-                      (((i + 1) / rowLength) / rowLength) -
-                  (0.5 * (MediaQuery.of(context).size.width - 60) / rowLength));
+          var sidePadding = 30;
+          var boardSize = MediaQuery.of(context).size.width - (sidePadding * 2);
+          var cellSize = boardSize / rowLength;
+          var y = boardSize * (((i + 1) / rowLength) / rowLength) -
+              (0.5 * cellSize);
 
-          endOffset = Offset(
-              MediaQuery.of(context).size.width - 60,
-              (MediaQuery.of(context).size.width - 60) *
-                      (((i + 1) / rowLength) / rowLength) -
-                  (0.5 * (MediaQuery.of(context).size.width - 60) / rowLength));
+          startOffset = Offset(0, y);
+          endOffset = Offset(boardSize, y);
         });
         // Navigator.pushReplacementNamed(context, '/win',
         //     arguments:
