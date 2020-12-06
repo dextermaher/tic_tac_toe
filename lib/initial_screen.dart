@@ -33,7 +33,7 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.pushNamed(context, '/play');
+                    Navigator.pushReplacementNamed(context, '/play');
                   },
                 ),
               ],

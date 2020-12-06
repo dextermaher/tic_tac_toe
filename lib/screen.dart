@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tic_tac_toe/win_message.dart';
 import 'package:tic_tac_toe/win_screen.dart';
+import 'consts.dart';
 import 'cell.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -15,13 +16,17 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int rowLength = 3;
-  List<Widget> cellList = List();
   bool hasCellListCreated = false;
   bool hasIconsFromBoardCreated = false;
   bool isX = true;
+  bool hasGameStarted = false;
+  bool hasWon = false;
   List iconsFromBoard = List();
   IconData circleIcon = Icons.panorama_fish_eye;
   IconData xIcon = Icons.clear;
+  String winMessage = 'Congrats!';
+  Offset startOffset;
+  Offset endOffset;
 
   void checkForLine(
     int index,
@@ -57,8 +62,26 @@ class _MyHomePageState extends State<MyHomePage> {
       }
       if (!rowElements.contains(false) && rowElements.length == rowLength) {
         print('horizontal win');
-        Navigator.pushNamed(context, '/win',
-            arguments: WinMessage('Won Horizontally!'));
+        setState(() {
+          print(i);
+          hasGameStarted = false;
+          hasWon = true;
+          winMessage = '${isX == false ? '×' : '○'} Won Horizontally!';
+          startOffset = Offset(
+              0,
+              (MediaQuery.of(context).size.width - 60) *
+                      (((i + 1) / rowLength) / rowLength) -
+                  (0.5 * (MediaQuery.of(context).size.width - 60) / rowLength));
+
+          endOffset = Offset(
+              MediaQuery.of(context).size.width - 60,
+              (MediaQuery.of(context).size.width - 60) *
+                      (((i + 1) / rowLength) / rowLength) -
+                  (0.5 * (MediaQuery.of(context).size.width - 60) / rowLength));
+        });
+        // Navigator.pushReplacementNamed(context, '/win',
+        //     arguments:
+        //         WinMessage('${isX == false ? '×' : '○'} Won Horizontally!'));
         break;
       }
       if (rowElements.length % rowLength == 0) {
@@ -71,7 +94,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void checkVertical(IconData icon) {
     List rowElements = [];
-    bool hasWon = false;
+    // bool hasWon = false;
     for (int i = 0; i < rowLength; i++) {
       for (int j = i; j < rowLength * rowLength; j += rowLength) {
         if (iconsFromBoard[j] == icon) {
@@ -84,11 +107,30 @@ class _MyHomePageState extends State<MyHomePage> {
           });
         }
         if (!rowElements.contains(false) && rowElements.length == rowLength) {
-          print('win vert $j');
-          Navigator.pushNamed(context, '/win',
-              arguments: WinMessage('Won Vertically!'));
+          setState(() {
+            hasGameStarted = false;
+            hasWon = true;
+            winMessage = '${isX == false ? '×' : '○'} Won Vertically!';
+            startOffset = Offset(
+                (MediaQuery.of(context).size.width - 60) *
+                        (((j + 1 - (rowLength * 2))) / rowLength) -
+                    (0.5 *
+                        (MediaQuery.of(context).size.width - 60) /
+                        rowLength),
+                0);
+            endOffset = Offset(
+                (MediaQuery.of(context).size.width - 60) *
+                        (((j + 1 - (rowLength * 2))) / rowLength) -
+                    (0.5 *
+                        (MediaQuery.of(context).size.width - 60) /
+                        rowLength),
+                MediaQuery.of(context).size.width - 60);
+          });
+          // Navigator.pushReplacementNamed(context, '/win',
+          //     arguments:
+          //         WinMessage('${isX == false ? '×' : '○'} Won Vertically!'));
 
-          hasWon = true;
+          // hasWon = true;
           break;
         }
         if (rowElements.length % rowLength == 0) {
@@ -98,7 +140,6 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       }
       if (hasWon) {
-        print('win vert external $i');
         break;
       }
     }
@@ -123,8 +164,22 @@ class _MyHomePageState extends State<MyHomePage> {
         }
         if (!rowElements.contains(false) && rowElements.length == rowLength) {
           print('win diag $j');
-          Navigator.pushNamed(context, '/win',
-              arguments: WinMessage('Won Diagonally!'));
+          setState(() {
+            hasGameStarted = false;
+            hasWon = true;
+            winMessage = '${isX == false ? '×' : '○'} Won Diagonally!';
+            if (j == (rowLength * rowLength) - 1) {
+              startOffset = Offset(0, 0);
+              endOffset = Offset(MediaQuery.of(context).size.width - 60,
+                  MediaQuery.of(context).size.width - 60);
+            } else if (j == rowLength * 2) {
+              startOffset = Offset(MediaQuery.of(context).size.width - 60, 0);
+              endOffset = Offset(0, MediaQuery.of(context).size.width - 60);
+            }
+          });
+          // Navigator.pushReplacementNamed(context, '/win',
+          //     arguments:
+          //         WinMessage('${isX == false ? '×' : '○'} Won Diagonally!'));
 
           break;
         }
@@ -135,7 +190,6 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       }
       if (!rowElements.contains(false) && rowElements.length == rowLength) {
-        print('win diag $i');
         break;
       }
       startingValue = rowLength - 1;
@@ -144,6 +198,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   IconData iconBrain(int index) {
+    if (!hasGameStarted) {
+      setState(() {
+        hasGameStarted = true;
+      });
+    }
     if (iconsFromBoard[index] == '') {
       if (isX) {
         //next click is circle
@@ -151,7 +210,6 @@ class _MyHomePageState extends State<MyHomePage> {
           isX = !isX;
         });
         fillCell(index, xIcon);
-
         checkForLine(index);
 
         return xIcon;
@@ -179,20 +237,20 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void cellListCreator() {
-    if (hasCellListCreated == false) {
-      setState(() {
-        hasCellListCreated = true;
-        cellList = List<Widget>.generate(
-          rowLength * rowLength,
-          (i) => Cell(
-            cellIndex: i,
-            onTap: iconBrain,
-          ),
-        );
-      });
-    }
-  }
+  // void cellListCreator() {
+  //   if (hasCellListCreated == false) {
+  //     setState(() {
+  //       hasCellListCreated = true;
+  //       cellList = List<Widget>.generate(
+  //         rowLength * rowLength,
+  //         (i) => Cell(
+  //           cellIndex: i,
+  //           onTap: iconBrain,
+  //         ),
+  //       );
+  //     });
+  //   }
+  // }
 
   void iconsFromBoardResseter() {
     if (hasIconsFromBoardCreated == false) {
@@ -208,7 +266,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    cellListCreator();
+    // cellListCreator();
     iconsFromBoardResseter();
 
     return Scaffold(
@@ -216,61 +274,148 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text("Let's Play!"),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          SafeArea(
-            child: Container(
-              margin: EdgeInsets.all(30),
-              decoration: BoxDecoration(
-                border: Border.all(width: 10, color: Colors.deepPurple),
+      body: Stack(children: [
+        Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            SafeArea(
+              child: Container(
+                margin: EdgeInsets.all(30),
+                decoration: BoxDecoration(
+                  border: Border.all(width: 10, color: Colors.deepPurple),
+                ),
+                child: (GridView.count(
+                  crossAxisCount: rowLength,
+                  scrollDirection: Axis.vertical,
+                  shrinkWrap: true,
+                  children: List<Widget>.generate(
+                    rowLength * rowLength,
+                    (i) => Cell(
+                      cellIndex: i,
+                      onTap: iconBrain,
+                    ),
+                  ),
+                )),
               ),
-              child: (GridView.count(
-                crossAxisCount: rowLength,
-                scrollDirection: Axis.vertical,
-                shrinkWrap: true,
-                children: cellList,
-              )),
             ),
-          ),
-          Slider(
-            value: rowLength.toDouble(),
-            min: 3,
-            max: 15,
-            activeColor: Colors.black,
-            inactiveColor: Colors.grey,
-            onChanged: (newVal) {
-              setState(() {
-                rowLength = newVal.floor();
-                hasCellListCreated = false;
-                hasIconsFromBoardCreated = false;
-              });
-            },
-          ),
-          RaisedButton(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
+            Slider(
+              value: rowLength.toDouble(),
+              min: 3,
+              max: 15,
+              activeColor: Colors.black,
+              inactiveColor: Colors.grey,
+              onChanged: (newVal) {
+                setState(() {
+                  print(MediaQuery.of(context).size.width);
+                  if (!hasGameStarted) {
+                    rowLength = newVal.floor();
+                    hasCellListCreated = false;
+                    hasIconsFromBoardCreated = false;
+                  }
+                });
+              },
             ),
-            color: Colors.black,
-            textColor: Colors.white,
-            child: Container(
-              padding: EdgeInsets.fromLTRB(3, 10, 3, 10),
-              child: Text(
-                'Restart',
-                style: TextStyle(
-                  fontSize: 20.0,
-                  fontWeight: FontWeight.bold,
+            RaisedButton(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              color: Colors.black,
+              textColor: Colors.white,
+              child: Container(
+                padding: EdgeInsets.fromLTRB(3, 10, 3, 10),
+                child: Text(
+                  'Restart',
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
+              onPressed: () {
+                // resetter();
+                // Navigator.pushReplacementNamed(context, '/win',
+                //     arguments: WinMessage('Game Over!'));
+                Navigator.pushReplacementNamed(context, '/play');
+              },
             ),
-            onPressed: () {
-              // resetter();
-              Navigator.pushNamed(context, '/win',
-                  arguments: WinMessage('Game Over!'));
-            },
-          ),
-        ],
-      ),
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(30, 90, 30, 0),
+          child: hasWon == true
+              ? Container(
+                  width: MediaQuery.of(context).size.width - 60,
+                  height: MediaQuery.of(context).size.width - 60,
+                  child: CustomPaint(
+                    painter: WinPainter(
+                      startOffset: startOffset,
+                      endOffset: endOffset,
+                    ),
+                  ),
+                )
+              : null,
+        ),
+        Center(
+          child: hasWon == true
+              ? Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: hasWon == true ? Color(0xbb000000) : null,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      winMessage,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 50,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                )
+              : null,
+        )
+      ]),
     );
   }
+}
+
+//
+//85 for first boxes vert
+//200 for second boxes vert
+//310 for third boxes vert
+
+//500 long and starting 30 down looks correct
+class WinPainter extends CustomPainter {
+  // final double rotation;
+  final Offset startOffset;
+  final Offset endOffset;
+  WinPainter({
+    // this.rotation,
+    this.startOffset,
+    this.endOffset,
+  });
+  @override
+  void paint(Canvas canvas, Size size) {
+    // canvas.translate(xPosition, kWinLineMidpointY);
+    // canvas.rotate(rotation);
+    // canvas.translate(-xPosition, -kWinLineMidpointY);
+
+    Paint paintRules = Paint()
+      ..color = Colors.black
+      ..strokeWidth = 10
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.fill;
+
+    // canvas.drawRect(
+    //     Offset(kWinLineOffsetX, kWinLineOffsetY) &
+    //         const Size(kWinLineWidth, kWinLineHeight),
+    //     paintRules);
+
+    canvas.drawLine(startOffset, endOffset, paintRules);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => true;
 }

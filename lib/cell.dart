@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 class Cell extends StatefulWidget {
   final int cellIndex;
   final Function onTap;
-  Cell({this.cellIndex, this.onTap});
+  Cell({
+    this.cellIndex,
+    this.onTap,
+  });
 
   @override
   _CellState createState() => _CellState();

@@ -16,6 +16,7 @@ class WinScreen extends StatelessWidget {
               children: [
                 Text(
                   winText.winMessage,
+                  textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 60),
                 ),
                 RaisedButton(
@@ -35,7 +36,7 @@ class WinScreen extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.pushNamed(context, '/play');
+                    Navigator.pushReplacementNamed(context, '/play');
                   },
                 ),
               ],
