@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tic_tac_toe/win_message.dart';
-import 'package:tic_tac_toe/win_screen.dart';
-import 'consts.dart';
 import 'cell.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -48,6 +45,22 @@ class _MyHomePageState extends State<MyHomePage> {
     checkDiag(icon);
   }
 
+/*
+HOW CHECK HORIZONTAL WORKS:
+1. the icon taken in is the only icon that it checks for a win scenario
+2. it creates a list that will be used to keep the checked elements
+3. starts a loop that loops through all cells in the board
+4. if the cell being checked has that icon in it, true is added to the list
+   if it does not have the icon, false is added
+5. if the list has elements equal to the number of cells in a row and there are 
+   no falses in the list, then the game has been won if that is not the case,
+   then the list is cleared as long as it has elements equal to the number of 
+   cells in a row
+
+IN THE ON WIN
+  in the on win, most things are self explanatory, but the vars and below 
+  are used to find the correct points for the win line
+*/
   void checkHorizontal(IconData icon) {
     List rowElements = [];
     for (int i = 0; i < rowLength * rowLength; i++) {
@@ -76,9 +89,6 @@ class _MyHomePageState extends State<MyHomePage> {
           startOffset = Offset(0, y);
           endOffset = Offset(boardSize, y);
         });
-        // Navigator.pushReplacementNamed(context, '/win',
-        //     arguments:
-        //         WinMessage('${isX == false ? '×' : '○'} Won Horizontally!'));
         break;
       }
       if (rowElements.length % rowLength == 0) {
@@ -89,9 +99,27 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+/*
+HOW CHECK VERTICAL WORKS:
+1. the icon taken in is the only icon that it checks for a win scenario
+2. it creates a list that will be used to keep the checked elements
+3. starts a loop that loops through the number of cells in a row
+4. starts a loop that loops through all cells in the board, increasing 
+   down a row every time. this is so that it checks one row, then the outer
+   loop moves onto the next row
+5. if the cell being checked has that icon in it, true is added to the list
+   if it does not have the icon, false is added
+6. if the list has elements equal to the number of cells in a row and there are 
+   no falses in the list, then the game has been won if that is not the case,
+   then the list is cleared as long as it has elements equal to the number of 
+   cells in a row
+   
+IN THE ON WIN
+  in the on win, most things are self explanatory, but the vars and below 
+  are used to find the correct points for the win line
+*/
   void checkVertical(IconData icon) {
     List rowElements = [];
-    // bool hasWon = false;
     for (int i = 0; i < rowLength; i++) {
       for (int j = i; j < rowLength * rowLength; j += rowLength) {
         if (iconsFromBoard[j] == icon) {
@@ -108,26 +136,17 @@ class _MyHomePageState extends State<MyHomePage> {
             hasGameStarted = false;
             hasWon = true;
             winMessage = '${isX == false ? '×' : '○'} Won Vertically!';
-            startOffset = Offset(
-                (MediaQuery.of(context).size.width - 60) *
-                        (((j + 1 - (rowLength * 2))) / rowLength) -
-                    (0.5 *
-                        (MediaQuery.of(context).size.width - 60) /
-                        rowLength),
-                0);
-            endOffset = Offset(
-                (MediaQuery.of(context).size.width - 60) *
-                        (((j + 1 - (rowLength * 2))) / rowLength) -
-                    (0.5 *
-                        (MediaQuery.of(context).size.width - 60) /
-                        rowLength),
-                MediaQuery.of(context).size.width - 60);
-          });
-          // Navigator.pushReplacementNamed(context, '/win',
-          //     arguments:
-          //         WinMessage('${isX == false ? '×' : '○'} Won Vertically!'));
 
-          // hasWon = true;
+            var sidePadding = 30;
+            var boardSize =
+                MediaQuery.of(context).size.width - (sidePadding * 2);
+            var cellSize = boardSize / rowLength;
+            var x = boardSize * ((j + 1 - (rowLength * 2)) / rowLength) -
+                (0.5 * cellSize);
+
+            startOffset = Offset(x, 0);
+            endOffset = Offset(x, boardSize);
+          });
           break;
         }
         if (rowElements.length % rowLength == 0) {
@@ -142,6 +161,32 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+/*
+HOW CHECK VERTICAL WORKS:
+1. the icon taken in is the only icon that it checks for a win scenario
+2. it creates a list that will be used to keep the checked elements
+3. the starting value determines the cell that is first checked
+4. the increase decrease is the amount that the loop should increase or
+   decrease by every loop
+5. starts a loop that loops through the number of cells in a row
+6. starts a loop that loops through all cells in the board, increasing 
+   down a row every time. this is so that it checks one row, then the outer
+   loop moves onto the next row
+7. if the cell being checked has that icon in it, true is added to the list
+   if it does not have the icon, false is added
+8. if the list has elements equal to the number of cells in a row and there are 
+   no falses in the list, then the game has been won if that is not the case,
+   then the list is cleared as long as it has elements equal to the number of 
+   cells in a row
+9. the starting value is changed to check starting with the last cell of the 
+   first row
+10. the increase decrease previously increased by one row down and one cell right,
+    it now increas by one row down and one cell left
+   
+IN THE ON WIN
+  in the on win, most things are self explanatory, but the vars and below 
+  are used to find the correct points for the win line
+*/
   void checkDiag(IconData icon) {
     List rowElements = [];
     var startingValue = 0;
@@ -165,18 +210,21 @@ class _MyHomePageState extends State<MyHomePage> {
             hasGameStarted = false;
             hasWon = true;
             winMessage = '${isX == false ? '×' : '○'} Won Diagonally!';
+
+            var sidePadding = 30;
+            var boardSize =
+                MediaQuery.of(context).size.width - (sidePadding * 2);
+
+            //if the last index checked in the win is the last cell
             if (j == (rowLength * rowLength) - 1) {
               startOffset = Offset(0, 0);
-              endOffset = Offset(MediaQuery.of(context).size.width - 60,
-                  MediaQuery.of(context).size.width - 60);
-            } else if (j == rowLength * 2) {
-              startOffset = Offset(MediaQuery.of(context).size.width - 60, 0);
-              endOffset = Offset(0, MediaQuery.of(context).size.width - 60);
+              endOffset = Offset(boardSize, boardSize);
+              //if the last index checked in the win is the first cell of last row
+            } else if (j + 1 == rowLength * 2 + 1) {
+              startOffset = Offset(boardSize, 0);
+              endOffset = Offset(0, boardSize);
             }
           });
-          // Navigator.pushReplacementNamed(context, '/win',
-          //     arguments:
-          //         WinMessage('${isX == false ? '×' : '○'} Won Diagonally!'));
 
           break;
         }
@@ -224,7 +272,6 @@ class _MyHomePageState extends State<MyHomePage> {
     } else {
       checkForLine(index);
       return iconsFromBoard[index];
-      //  return cellData[index];
     }
   }
 
@@ -233,21 +280,6 @@ class _MyHomePageState extends State<MyHomePage> {
       iconsFromBoard[i] = icon;
     });
   }
-
-  // void cellListCreator() {
-  //   if (hasCellListCreated == false) {
-  //     setState(() {
-  //       hasCellListCreated = true;
-  //       cellList = List<Widget>.generate(
-  //         rowLength * rowLength,
-  //         (i) => Cell(
-  //           cellIndex: i,
-  //           onTap: iconBrain,
-  //         ),
-  //       );
-  //     });
-  //   }
-  // }
 
   void iconsFromBoardResseter() {
     if (hasIconsFromBoardCreated == false) {
@@ -263,7 +295,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // cellListCreator();
     iconsFromBoardResseter();
 
     return Scaffold(
@@ -329,9 +360,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
               onPressed: () {
-                // resetter();
-                // Navigator.pushReplacementNamed(context, '/win',
-                //     arguments: WinMessage('Game Over!'));
                 Navigator.pushReplacementNamed(context, '/play');
               },
             ),
@@ -378,37 +406,20 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-//
-//85 for first boxes vert
-//200 for second boxes vert
-//310 for third boxes vert
-
-//500 long and starting 30 down looks correct
 class WinPainter extends CustomPainter {
-  // final double rotation;
   final Offset startOffset;
   final Offset endOffset;
   WinPainter({
-    // this.rotation,
     this.startOffset,
     this.endOffset,
   });
   @override
   void paint(Canvas canvas, Size size) {
-    // canvas.translate(xPosition, kWinLineMidpointY);
-    // canvas.rotate(rotation);
-    // canvas.translate(-xPosition, -kWinLineMidpointY);
-
     Paint paintRules = Paint()
       ..color = Colors.black
       ..strokeWidth = 10
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.fill;
-
-    // canvas.drawRect(
-    //     Offset(kWinLineOffsetX, kWinLineOffsetY) &
-    //         const Size(kWinLineWidth, kWinLineHeight),
-    //     paintRules);
 
     canvas.drawLine(startOffset, endOffset, paintRules);
   }
