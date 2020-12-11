@@ -22,8 +22,25 @@ class _MyHomePageState extends State<MyHomePage> {
   IconData circleIcon = Icons.panorama_fish_eye;
   IconData xIcon = Icons.clear;
   String winMessage = 'Congrats!';
+  double screenSize;
+  double sidePadding = 30;
   Offset startOffset;
   Offset endOffset;
+
+  void widthInit() {
+    if (screenSize == null) {
+      if (MediaQuery.of(context).size.width <
+          MediaQuery.of(context).size.height) {
+        setState(() {
+          screenSize = MediaQuery.of(context).size.width;
+        });
+      } else {
+        setState(() {
+          MediaQuery.of(context).size.height;
+        });
+      }
+    }
+  }
 
   void checkForLine(
     int index,
@@ -80,8 +97,7 @@ IN THE ON WIN
           hasGameStarted = false;
           hasWon = true;
           winMessage = '${isX == false ? '×' : '○'} Won Horizontally!';
-          var sidePadding = 30;
-          var boardSize = MediaQuery.of(context).size.width - (sidePadding * 2);
+          var boardSize = screenSize - (sidePadding * 2);
           var cellSize = boardSize / rowLength;
           var y = boardSize * (((i + 1) / rowLength) / rowLength) -
               (0.5 * cellSize);
@@ -137,9 +153,7 @@ IN THE ON WIN
             hasWon = true;
             winMessage = '${isX == false ? '×' : '○'} Won Vertically!';
 
-            var sidePadding = 30;
-            var boardSize =
-                MediaQuery.of(context).size.width - (sidePadding * 2);
+            var boardSize = screenSize - (sidePadding * 2);
             var cellSize = boardSize / rowLength;
             var x = boardSize * ((j + 1 - (rowLength * 2)) / rowLength) -
                 (0.5 * cellSize);
@@ -211,9 +225,7 @@ IN THE ON WIN
             hasWon = true;
             winMessage = '${isX == false ? '×' : '○'} Won Diagonally!';
 
-            var sidePadding = 30;
-            var boardSize =
-                MediaQuery.of(context).size.width - (sidePadding * 2);
+            var boardSize = screenSize - (sidePadding * 2);
 
             //if the last index checked in the win is the last cell
             if (j == (rowLength * rowLength) - 1) {
@@ -296,7 +308,7 @@ IN THE ON WIN
   @override
   Widget build(BuildContext context) {
     iconsFromBoardResseter();
-
+    widthInit();
     return Scaffold(
       backgroundColor: Colors.blueGrey[100],
       appBar: AppBar(
@@ -308,7 +320,7 @@ IN THE ON WIN
           children: [
             SafeArea(
               child: Container(
-                margin: EdgeInsets.all(30),
+                margin: EdgeInsets.all(sidePadding),
                 decoration: BoxDecoration(
                   border: Border.all(width: 10, color: Colors.deepPurple),
                 ),
@@ -334,7 +346,6 @@ IN THE ON WIN
               inactiveColor: Colors.grey,
               onChanged: (newVal) {
                 setState(() {
-                  print(MediaQuery.of(context).size.width);
                   if (!hasGameStarted) {
                     rowLength = newVal.floor();
                     hasCellListCreated = false;
@@ -369,8 +380,8 @@ IN THE ON WIN
           padding: const EdgeInsets.fromLTRB(30, 90, 30, 0),
           child: hasWon == true
               ? Container(
-                  width: MediaQuery.of(context).size.width - 60,
-                  height: MediaQuery.of(context).size.width - 60,
+                  width: screenSize - (sidePadding * 2),
+                  height: screenSize - (sidePadding * 2),
                   child: CustomPaint(
                     painter: WinPainter(
                       startOffset: startOffset,
