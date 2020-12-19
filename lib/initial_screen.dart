@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:tic_tac_toe/screen.dart';
 
-class WelcomeScreen extends StatelessWidget {
+class WelcomeScreen extends StatefulWidget {
   static const routeName = '/';
+
+  @override
+  _WelcomeScreenState createState() => _WelcomeScreenState();
+}
+
+class _WelcomeScreenState extends State<WelcomeScreen> {
+  double sliderValue = 3;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,6 +24,20 @@ class WelcomeScreen extends StatelessWidget {
                 Text(
                   'Welcome!',
                   style: TextStyle(color: Colors.black, fontSize: 60),
+                ),
+                Text(
+                  'Number of cells: ${sliderValue.toInt() * sliderValue.toInt()}',
+                  style: TextStyle(color: Colors.black, fontSize: 60),
+                ),
+                Slider(
+                  value: sliderValue,
+                  min: 3,
+                  max: 20,
+                  onChanged: (newValue) {
+                    setState(() {
+                      sliderValue = newValue.floor().toDouble();
+                    });
+                  },
                 ),
                 RaisedButton(
                   shape: RoundedRectangleBorder(
@@ -33,7 +56,13 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.pushReplacementNamed(context, '/play');
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MyHomePage(
+                            boardsize: sliderValue,
+                          ),
+                        ));
                   },
                 ),
               ],

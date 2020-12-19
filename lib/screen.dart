@@ -3,9 +3,8 @@ import 'cell.dart';
 
 class MyHomePage extends StatefulWidget {
   static const routeName = '/play';
-  MyHomePage({
-    Key key,
-  }) : super(key: key);
+  final double boardsize;
+  MyHomePage({Key key, this.boardsize}) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -13,6 +12,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int rowLength = 3;
+  bool hasBoardSizeCreated = false;
   bool hasCellListCreated = false;
   bool hasIconsFromBoardCreated = false;
   bool isX = true;
@@ -39,6 +39,15 @@ class _MyHomePageState extends State<MyHomePage> {
           MediaQuery.of(context).size.height;
         });
       }
+    }
+  }
+
+  void setBoardSize() {
+    if (!hasBoardSizeCreated) {
+      setState(() {
+        hasBoardSizeCreated = true;
+        rowLength = widget.boardsize.toInt();
+      });
     }
   }
 
@@ -307,6 +316,7 @@ IN THE ON WIN
 
   @override
   Widget build(BuildContext context) {
+    setBoardSize();
     iconsFromBoardResseter();
     widthInit();
     return Scaffold(
@@ -338,22 +348,6 @@ IN THE ON WIN
                 )),
               ),
             ),
-            Slider(
-              value: rowLength.toDouble(),
-              min: 3,
-              max: 15,
-              activeColor: Colors.black,
-              inactiveColor: Colors.grey,
-              onChanged: (newVal) {
-                setState(() {
-                  if (!hasGameStarted) {
-                    rowLength = newVal.floor();
-                    hasCellListCreated = false;
-                    hasIconsFromBoardCreated = false;
-                  }
-                });
-              },
-            ),
             RaisedButton(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
@@ -371,13 +365,19 @@ IN THE ON WIN
                 ),
               ),
               onPressed: () {
-                Navigator.pushReplacementNamed(context, '/play');
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MyHomePage(
+                        boardsize: rowLength.toDouble(),
+                      ),
+                    ));
               },
             ),
           ],
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(30, 90, 30, 0),
+          padding: const EdgeInsets.fromLTRB(30, 130, 30, 0),
           child: hasWon == true
               ? Container(
                   width: screenSize - (sidePadding * 2),
